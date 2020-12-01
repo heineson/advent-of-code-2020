@@ -3,7 +3,9 @@ package se.heinszn.aoc2020.day1
 fun main() {
     for (a in input) {
         for (b in input) {
-            if (a + b == 2020) println(a * b)
+            for (c in input) {
+                if (a + b +c == 2020) println(a * b * c)
+            }
         }
     }
 }
