@@ -17,10 +17,26 @@ fun validate(policy: Policy, pwd: String): Boolean {
     return false
 }
 
+fun validatePart2(policy: Policy, pwd: String): Boolean {
+    val l1 = pwd[policy.min - 1].toString()
+    val l2 = pwd[policy.max - 1].toString()
+    if (l1 == policy.letter && l2 != policy.letter) {
+        return true;
+    }
+    if (l1 != policy.letter && l2 == policy.letter) {
+        return true;
+    }
+    return false
+}
+
 fun main() {
     val data = readFile({ lineParser(it) })
+
     val valid = data.map { validate(it.first, it.second) }.count { it }
     println("Valid pwds: $valid")
+
+    val valid2 = data.map { validatePart2(it.first, it.second) }.count { it }
+    println("Valid pwds part 2: $valid2")
 }
 
 val testData = listOf(
