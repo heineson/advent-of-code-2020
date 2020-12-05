@@ -1,6 +1,7 @@
 package se.heinszn.aoc2020
 
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -40,6 +41,9 @@ fun readFileIntoTokens(groupSeparatorLinePattern: String = "", tokenSeparator: S
 }
 
 /****** 2d map utils ********/
+
+fun toDegrees(rad: Double): Double = (rad * 180) / PI
+fun toRadians(deg: Double): Double = (deg * PI) / 180
 
 class Coord(val x: Int, val y: Int) {
     operator fun plus(v: Vect): Coord = Coord(this.x + v.dx, this.y + v.dy)
