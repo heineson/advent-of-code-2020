@@ -18,7 +18,7 @@ fun <T> readFile(lineParser: (line: String) -> T, filename: String = "./data.txt
 fun readLinesIntoTokens(lines: List<String>, groupSeparatorLinePattern: String = "", tokenSeparator: String = " "): List<List<String>> {
     val groups = mutableListOf<List<String>>()
     var group = mutableListOf<String>()
-    lines.forEach { s ->
+    lines.forEachIndexed { i, s ->
         run {
             if (s == groupSeparatorLinePattern) {
                 groups.add(group)
@@ -26,7 +26,7 @@ fun readLinesIntoTokens(lines: List<String>, groupSeparatorLinePattern: String =
             } else {
                 group.addAll(s.split(tokenSeparator))
                 // In case final line is not a "separator line"
-                if (s == lines.last()) {
+                if (i == lines.size - 1) {
                     groups.add(group)
                 }
             }
