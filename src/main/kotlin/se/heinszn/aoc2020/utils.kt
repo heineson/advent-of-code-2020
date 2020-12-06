@@ -47,16 +47,28 @@ fun toDegrees(rad: Double): Double = (rad * 180) / PI
 fun toRadians(deg: Double): Double = (deg * PI) / 180
 
 data class Coord(val x: Int, val y: Int) {
-    operator fun plus(v: Vect): Coord = Coord(this.x + v.dx, this.y + v.dy)
+    operator fun plus(v: Vect): Coord = Coord(x + v.dx, y + v.dy)
 
-    fun up(): Coord = Coord(this.x, this.y + 1)
-    fun right(): Coord = Coord(this.x + 1, this.y)
-    fun down(): Coord = Coord(this.x, this.y - 1)
-    fun left(): Coord = Coord(this.x - 1, this.y)
+    fun up(): Coord = Coord(x, y + 1)
+    fun right(): Coord = Coord(x + 1, y)
+    fun down(): Coord = Coord(x, y - 1)
+    fun left(): Coord = Coord(x - 1, y)
 
     fun manhattan(other: Coord): Int {
-        return abs(this.x - other.x) + abs(this.y - other.y)
+        return abs(x - other.x) + abs(y - other.y)
     }
+
+    fun cardinalNeighbors(): List<Coord> = listOf(up(), left(), down(), right())
+    fun surroundingNeighbors(): List<Coord> = listOf(
+        up(),
+        Coord(x + 1, y + 1),
+        right(),
+        Coord(x + 1, y - 1),
+        down(),
+        Coord(x - 1, y - 1),
+        left(),
+        Coord(x - 1, y + 1)
+    )
 
     override fun toString(): String {
         return "($x, $y)"
