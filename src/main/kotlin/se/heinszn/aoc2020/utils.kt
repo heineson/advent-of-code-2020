@@ -15,12 +15,12 @@ fun <T> readFile(lineParser: (line: String) -> T, filename: String = "./data.txt
     return parseLines(lineParser, File(filename).readLines())
 }
 
-fun readLinesIntoTokens(lines: List<String>, groupSeparatorLinePattern: String = "", tokenSeparator: String = " "): List<List<String>> {
+fun readLinesIntoTokens(lines: List<String>, groupSeparatorLine: String = "", tokenSeparator: String = " "): List<List<String>> {
     val groups = mutableListOf<List<String>>()
     var group = mutableListOf<String>()
     lines.forEachIndexed { i, s ->
         run {
-            if (s == groupSeparatorLinePattern) {
+            if (s == groupSeparatorLine) {
                 groups.add(group)
                 group = mutableListOf()
             } else {
@@ -32,6 +32,7 @@ fun readLinesIntoTokens(lines: List<String>, groupSeparatorLinePattern: String =
             }
         }
     }
+
 
     return groups
 }
