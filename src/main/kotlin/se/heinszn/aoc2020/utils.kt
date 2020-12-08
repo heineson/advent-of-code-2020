@@ -41,6 +41,10 @@ fun readFileIntoTokens(groupSeparatorLinePattern: String = "", tokenSeparator: S
     return readLinesIntoTokens(File(filename).readLines(), groupSeparatorLinePattern, tokenSeparator)
 }
 
+/****** extensions *******/
+
+fun <E> Iterable<E>.updateElement(index: Int, newElem: E) = mapIndexed { i, existing ->  if (i == index) newElem else existing }
+
 /****** 2d map utils ********/
 
 fun toDegrees(rad: Double): Double = (rad * 180) / PI
