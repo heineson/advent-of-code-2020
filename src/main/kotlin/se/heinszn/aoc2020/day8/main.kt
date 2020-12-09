@@ -8,7 +8,9 @@ fun lineParser(line: String): Pair<String, Int> {
     return Pair(parts[0], parts[1].toInt())
 }
 
-class Program(private val program: List<Pair<String, Int>>) {
+typealias ProgramCode = List<Pair<String, Int>>
+
+class Program(private val program: ProgramCode) {
 
     private var accumulator = 0
     private var pointer: Int = 0
@@ -51,11 +53,11 @@ class Program(private val program: List<Pair<String, Int>>) {
     }
 }
 
-fun changeNext(index: Int, program: List<Pair<String, Int>>): Pair<Int, List<Pair<String, Int>>> {
+fun changeNext(index: Int, program: ProgramCode): Pair<Int, ProgramCode> {
     var i = index
     while (program[i].first == "acc") i++
     val elem = if (program[i].first == "jmp") Pair("nop", program[i].second) else Pair("jmp", program[i].second)
-    val newProgram: List<Pair<String, Int>> = program.updateElement(i, elem)
+    val newProgram: ProgramCode = program.updateElement(i, elem)
     return Pair(i, newProgram)
 }
 
