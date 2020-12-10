@@ -8,13 +8,7 @@ data class Adapter(val rating: Int) {
 
 fun getAllValidFor(a: Adapter, data: List<Adapter>): List<Adapter> = data.filter { it.canConnectTo(a) }
 
-fun getDeviceRating(data: List<Adapter>): Int = 3 + (data.map { it.rating }.maxOrNull() ?: 0)
-
-fun main() {
-//    val data = testData.map { Adapter(it.toInt()) }
-//    val data = testData2.map { Adapter(it.toInt()) }
-    val data = readFile({ Adapter(it.toInt()) })
-
+fun useAll(data: List<Adapter>): Pair<Int, Int> {
     val maxRating = data.map { it.rating }.maxOrNull() ?: 0
     var current = Adapter(0)
     var jumps1 = 0
@@ -30,8 +24,50 @@ fun main() {
     }
     jumps3++ // for the device, always 3
 
+    return Pair(jumps1, jumps3)
+}
+
+// TODO never stops counting, ditch this!
+fun findAllCombinations(data: List<Adapter>): Long {
+    val curr = Adapter(0)
+    var paths: Long = 1
+
+    return countPaths(curr, paths, data)
+}
+
+fun countPaths(current: Adapter, paths: Long, data: List<Adapter>): Long {
+    val allNew = getAllValidFor(current, data)
+    if (allNew.isNotEmpty()) {
+        val newPaths = paths + allNew.size - 1
+        return newPaths + allNew.map { countPaths(it, 0, data) }.sum()
+    }
+    return paths
+}
+
+fun findAllCombinations2(data: List<Adapter>): Long? {
+    val sorted = data.sortedBy { it.rating }.map { it.rating }
+    val allSorted = sorted + (sorted[sorted.size - 1] + 3)
+
+    val counter = mutableMapOf<Int, Long>()
+    counter[0] = 1
+
+    for (jolt in allSorted) {
+        counter[jolt] = (counter[jolt - 1] ?: 0) + (counter[jolt - 2] ?: 0) + (counter[jolt - 3] ?: 0)
+    }
+
+    return counter[allSorted[allSorted.size - 1]]
+}
+
+fun main() {
+//    val data = testData.map { Adapter(it.toInt()) }
+//    val data = testData2.map { Adapter(it.toInt()) }
+    val data = readFile({ Adapter(it.toInt()) })
+
+    val (jumps1, jumps3) = useAll(data)
     println("1: $jumps1, 3: $jumps3")
     println("part1: ${jumps1 * jumps3}")
+
+    println("Combinations: ${findAllCombinations2(data)}")
 }
 
 val testData = """
