@@ -52,11 +52,16 @@ fun toRadians(deg: Double): Double = (deg * PI) / 180
 
 data class Coord(val x: Int, val y: Int) {
     operator fun plus(v: Vect): Coord = Coord(x + v.dx, y + v.dy)
+    operator fun plus(c: Coord): Coord = Coord(x + c.x, y + c.y)
 
     fun up(): Coord = Coord(x, y + 1)
+    fun ne(): Coord = Coord(x + 1, y + 1)
     fun right(): Coord = Coord(x + 1, y)
+    fun se(): Coord = Coord(x + 1, y - 1)
     fun down(): Coord = Coord(x, y - 1)
+    fun sw(): Coord = Coord(x - 1, y - 1)
     fun left(): Coord = Coord(x - 1, y)
+    fun nw(): Coord = Coord(x - 1, y + 1)
 
     fun manhattan(other: Coord): Int {
         return abs(x - other.x) + abs(y - other.y)
@@ -65,21 +70,38 @@ data class Coord(val x: Int, val y: Int) {
     fun cardinalNeighbors(): List<Coord> = listOf(up(), left(), down(), right())
     fun surroundingNeighbors(): List<Coord> = listOf(
         up(),
-        Coord(x + 1, y + 1),
+        ne(),
         right(),
-        Coord(x + 1, y - 1),
+        se(),
         down(),
-        Coord(x - 1, y - 1),
+        sw(),
         left(),
-        Coord(x - 1, y + 1)
+        nw()
     )
+    fun inDirectionUntil(d: Vect, stopCondition: (c: Coord) -> Boolean): List<Coord> {
+        val seq = generateSequence(this, { this + d })
+        return seq.takeWhile { !stopCondition(it) }.toList()
+    }
 
     override fun toString(): String {
         return "($x, $y)"
     }
 }
 
+enum class Rotation { CW, CCW }
 data class Vect(val dx: Int, val dy: Int) {
     operator fun plus(other: Vect): Vect = Vect(this.dx + other.dx, this.dy + other.dy)
+    operator fun times(v: Int): Vect = Vect(dx * v, dy * v)
+
     fun length(): Double = sqrt(this.dx.toDouble()*this.dx + this.dy*this.dy)
+
+    fun rotate90(d: Rotation, steps: Int = 1): Vect {
+        return when (steps % 4) {
+            0 -> this.copy()
+            1 -> if (d  == Rotation.CW) Vect(dy, -dx) else Vect(-dy, dx)
+            2 -> Vect(-dx, -dy)
+            3 -> if (d  == Rotation.CCW) Vect(dy, -dx) else Vect(-dy, dx)
+            else -> throw IllegalStateException("$steps % 4 should never end up here")
+        }
+    }
 }

@@ -38,6 +38,13 @@ internal class UtilsKtTest {
     fun testVect() {
         assertThat(Vect(1, 1).length()).isEqualTo(sqrt(2.0))
         assertThat(Vect(4, 3).length()).isEqualTo(5.0)
+
+        assertThat(Vect(1, 0).rotate90(Rotation.CW)).isEqualTo(Vect(0, -1))
+        assertThat(Vect(1, 0).rotate90(Rotation.CW, 2)).isEqualTo(Vect(-1, 0))
+        assertThat(Vect(1, 0).rotate90(Rotation.CW, 3)).isEqualTo(Vect(0, 1))
+        assertThat(Vect(1, 0).rotate90(Rotation.CW, 4)).isEqualTo(Vect(1, 0))
+
+        assertThat(Vect(1, 0).rotate90(Rotation.CCW)).isEqualTo(Vect(0, 1))
     }
 
     private val lines1 = """
