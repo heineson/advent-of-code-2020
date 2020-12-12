@@ -79,7 +79,7 @@ data class Coord(val x: Int, val y: Int) {
         nw()
     )
     fun inDirectionUntil(d: Vect, stopCondition: (c: Coord) -> Boolean): List<Coord> {
-        val seq = generateSequence(this, { this + d })
+        val seq: Sequence<Coord> = generateSequence(this + d, { it + d })
         return seq.takeWhile { !stopCondition(it) }.toList()
     }
 

@@ -32,6 +32,13 @@ internal class UtilsKtTest {
         assertThat(c.left()).isEqualTo(Coord(4, 5))
 
         assertThat(c.manhattan(Coord(10, 14))).isEqualTo(14)
+
+        assertThat(c.inDirectionUntil(Vect(1, 2)) { it.x >= 10 }).containsExactly(
+                Coord(6, 7),
+                Coord(7, 9),
+                Coord(8, 11),
+                Coord(9, 13)
+        )
     }
 
     @Test
