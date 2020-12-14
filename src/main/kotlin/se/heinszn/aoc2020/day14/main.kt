@@ -41,7 +41,7 @@ fun updateMemory2(pos: Long, value: Long, state: State){
     val result = bits.zip(state.currMask) { b, m -> if (m == '0') b else m }
 
     val list = loop(String(result.toCharArray()), mutableListOf())
-    println(list.joinToString(", "))
+    // println("update $pos: " + list.joinToString(", "))
 
     for (addr in list) {
         state.currMem[java.lang.Long.parseLong(String(addr.toCharArray()), 2)] = value
@@ -50,7 +50,8 @@ fun updateMemory2(pos: Long, value: Long, state: State){
 
 fun loop(mask: String, acc: MutableList<String>): List<String> {
     val xs = mask.mapIndexed { i, c -> Pair(i, c) }.filter { p -> p.second == 'X' }
-    return if (xs.isEmpty()) acc else acc + loop(mask.replaceFirst('X', '1'), acc) + loop(mask.replaceFirst('X', '0'), acc)
+    // println("loop: $xs, acc: $acc")
+    return if (xs.isEmpty()) acc + mask else acc + loop(mask.replaceFirst('X', '1'), acc) + loop(mask.replaceFirst('X', '0'), acc)
 }
 
 
@@ -72,7 +73,8 @@ fun part1() {
 }
 
 fun part2() {
-    val data = testData2.map { lineParser(it) }
+//    val data = testData2.map { lineParser(it) }
+    val data = readFile({ lineParser(it) })
 
     var state = State("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", mutableMapOf())
     data.forEach { state = programStep2(it, state) }
