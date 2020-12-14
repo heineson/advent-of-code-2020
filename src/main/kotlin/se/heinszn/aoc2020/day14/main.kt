@@ -40,7 +40,7 @@ fun updateMemory2(pos: Long, value: Long, state: State){
     val bits = pos.toString(2).padStart(36, '0')
     val result = bits.zip(state.currMask) { b, m -> if (m == '0') b else m }
 
-    val list = loop(String(result.toCharArray()), mutableListOf())
+    val list = findAddrs(String(result.toCharArray()), mutableListOf())
     // println("update $pos: " + list.joinToString(", "))
 
     for (addr in list) {
@@ -48,10 +48,11 @@ fun updateMemory2(pos: Long, value: Long, state: State){
     }
 }
 
-fun loop(mask: String, acc: MutableList<String>): List<String> {
-    val xs = mask.mapIndexed { i, c -> Pair(i, c) }.filter { p -> p.second == 'X' }
+fun findAddrs(maskedAddr: String, acc: MutableList<String>): List<String> {
+    val xs = maskedAddr.filter { it == 'X' }
     // println("loop: $xs, acc: $acc")
-    return if (xs.isEmpty()) acc + mask else acc + loop(mask.replaceFirst('X', '1'), acc) + loop(mask.replaceFirst('X', '0'), acc)
+    return if (xs.isEmpty()) acc + maskedAddr else
+        acc + findAddrs(maskedAddr.replaceFirst('X', '1'), acc) + findAddrs(maskedAddr.replaceFirst('X', '0'), acc)
 }
 
 
