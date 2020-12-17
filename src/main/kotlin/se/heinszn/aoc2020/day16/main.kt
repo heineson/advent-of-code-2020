@@ -43,7 +43,7 @@ fun part2(notes: List<Note>, myTicket: List<Int>, nearby: List<List<Int>>) {
 
 fun findNote(allValues: List<Int>, notes: List<Note>): Note? {
     val notesForValue = mutableListOf<Note>()
-    for (n in notes) {
+    notes.forEach { n ->
         if (matchesNote(allValues, n)) {
             notesForValue.add(n)
         }
