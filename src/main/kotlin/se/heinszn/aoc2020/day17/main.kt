@@ -40,13 +40,13 @@ fun cycle3(state: Grid3): Grid3 {
     val yr: IntRange = (ys.minOrNull() ?: 0)-1..(ys.maxOrNull() ?: 0)+1
     val zr: IntRange = (zs.minOrNull() ?: 0)-1..(zs.maxOrNull() ?: 0)+1
 
-    var newState: Grid3 = mutableMapOf()
+    val newState: Grid3 = mutableMapOf()
 
     for (xi in xr) {
         for (yi in yr) {
             for (zi in zr) {
                 val c = Coord3(xi, yi, zi)
-                println("$c ${getActiveSurrounding3(c, state)}")
+//                println("$c ${getActiveSurrounding3(c, state)}")
                 if (state[c] == 1) {
                     if (getActiveSurrounding3(c, state).size !in 2..3) {
                         newState[c] = 0
@@ -65,7 +65,7 @@ fun cycle3(state: Grid3): Grid3 {
         }
     }
 
-    printGrid(newState)
+//    printGrid(newState)
     return newState
 }
 
@@ -79,14 +79,13 @@ fun cycle4(state: Grid4): Grid4 {
     val zr: IntRange = (zs.minOrNull() ?: 0)-1..(zs.maxOrNull() ?: 0)+1
     val wr: IntRange = (ws.minOrNull() ?: 0)-1..(ws.maxOrNull() ?: 0)+1
 
-    var newState: Grid4 = mutableMapOf()
+    val newState: Grid4 = mutableMapOf()
 
     for (xi in xr) {
         for (yi in yr) {
             for (zi in zr) {
                 for (wi in wr) {
                     val c = Coord4(xi, yi, zi, wi)
-                    //println("$c ${getActiveSurrounding4(c, state)}")
                     if (state[c] == 1) {
                         if (getActiveSurrounding4(c, state).size !in 2..3) {
                             newState[c] = 0
@@ -106,7 +105,6 @@ fun cycle4(state: Grid4): Grid4 {
         }
     }
 
-    //printGrid(newState)
     return newState
 }
 
@@ -135,21 +133,19 @@ fun phase1(data: List<String>) {
     state = cycle3(state)
     state = cycle3(state)
     state = cycle3(state)
-    printGrid(state)
-    println("Part 1: ${state.values.count { it == 1 }}")
+//    printGrid(state)
+    println("Part 1: ${state.values.count { it == 1 }}") // 276
 }
 
 fun phase2(data: List<String>) {
     var state = loadGrid4(data)
-//    printGrid(state)
     state = cycle4(state)
     state = cycle4(state)
     state = cycle4(state)
     state = cycle4(state)
     state = cycle4(state)
     state = cycle4(state)
-//    printGrid(state)
-    println("Part 2: ${state.values.count { it == 1 }}")
+    println("Part 2: ${state.values.count { it == 1 }}") // 2136
 }
 
 fun main() {
