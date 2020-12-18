@@ -1,5 +1,6 @@
 package se.heinszn.aoc2020.day18
 
+import se.heinszn.aoc2020.readFile
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
@@ -21,8 +22,9 @@ data class Expr(val l: Expr? = null, val r: Expr? = null, val op: Op? = null, va
 }
 
 fun parser(e: String): Expr {
+    println("Parsing: $e")
     val tokens = e.split(" ")
-    return parseTokens(tokens, null)
+    return parseTokens(tokens, null) ?: throw IllegalStateException("smth")
 }
 
 fun parseOp(s: String): Op {
@@ -33,9 +35,9 @@ fun parseOp(s: String): Op {
     }
 }
 
-fun parseTokens(ts: List<String>, right: Expr?): Expr {
+fun parseTokens(ts: List<String>, right: Expr?): Expr? {
     if (ts.isEmpty()) {
-        return right!!
+        return right
     }
     val elem = ts.last()
     val rest = ts.dropLast(1)
@@ -101,7 +103,8 @@ fun eval(e: Expr): Long {
 }
 
 fun main() {
-    val data = testData.map { parser(it) }
+//    val data = testData.map { parser(it) }
+    val data = readFile({ parser(it) })
     data.forEach { println(it) }
     println()
     data.forEach { println(eval(it)) }
@@ -115,4 +118,5 @@ val testData = """
     5 + (8 * 3 + 9 + 3 * 4 * 3)
     5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))
     ((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
+    (5 * 9 * 2 * 7 * 8 + 6) + (5 + 5)
 """.trimIndent().split("\n")
