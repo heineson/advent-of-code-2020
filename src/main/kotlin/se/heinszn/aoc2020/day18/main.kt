@@ -23,12 +23,20 @@ fun parser(e: String): Expr {
     val tokens = e.split(" ")
     val right = tokens.last()
 
-    return parseTokens(tokens.dropLast(1), Expr(k = right.toLong()))
+    return parseTokens(tokens, null)
 }
 
-fun parseTokens(ts: List<String>, right: Expr): Expr {
+fun parseOp(s: String): Op {
+    return when (s) {
+        "+" -> Op.PLUS
+        "*" -> Op.TIMES
+        else -> throw IllegalArgumentException("No operator: $s")
+    }
+}
+
+fun parseTokens(ts: List<String>, right: Expr?): Expr {
     if (ts.isEmpty()) {
-        return right
+        return right!!
     }
     val elem = ts.last()
     val rest = ts.dropLast(1)
@@ -39,7 +47,15 @@ fun parseTokens(ts: List<String>, right: Expr): Expr {
     return when (elem) {
         "+" -> Expr(parseTokens(rest, right), right, Op.PLUS, null)
         "*" -> Expr(parseTokens(rest, right), right, Op.TIMES, null)
-        else -> throw IllegalArgumentException("Should not get here, value: ${elem}")
+        else -> {
+            if (elem.endsWith(")")) {
+                val itemCount = rest.takeLastWhile { !it.startsWith("(") }.count() + 1
+                val items = (rest.takeLast(itemCount) + elem).map { it.removePrefix("(").removeSuffix(")") }
+                println("Expr(parseTokens(${rest.dropLast(itemCount + 1)}, right), parseTokens(${items}, right)), ${rest.dropLast(itemCount).last()}")
+                return Expr(parseTokens(rest.dropLast(itemCount + 1), right), parseTokens(items, right), parseOp(rest.dropLast(itemCount).last()))
+            }
+            throw IllegalArgumentException("Should not get here, value: $elem")
+        }
     }
 }
 
@@ -47,8 +63,8 @@ fun eval(e: Expr): Long {
     if (e.k != null) {
         return e.k
     }
-//    if (e.op != null) {
-        return when(e.op!!) {
+    if (e.op != null) {
+        return when (e.op) {
             Op.PLUS -> {
                 println("Eval: ${e.l} + ${e.r}")
                 eval(e.l!!) + eval(e.r!!)
@@ -58,13 +74,18 @@ fun eval(e: Expr): Long {
                 eval(e.l!!) * eval(e.r!!)
             }
         }
-//    }
+    }
+    return -1
+
 }
 
 fun main() {
-    val data = testData.take(1).map { parser(it) }
-    println(data)
-    println(eval(data[0]))
+    val data = testData.take(2).map { parser(it) }
+    data.forEach { println(it) }
+    println()
+    data.forEach { println(eval(it)) }
+    println()
+    println("Part 1: ${data.map { eval(it) }.sum()}")
 }
 
 val testData = """
