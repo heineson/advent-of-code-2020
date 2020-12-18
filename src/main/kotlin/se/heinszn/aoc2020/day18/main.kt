@@ -101,24 +101,6 @@ fun eval(e: Expr): Long {
     throw IllegalStateException("No op and no number and no right: ${e.l}, ${e.r}")
 }
 
-val addGroupRegex = """(?:[^(]|\d+) \+ (\d+|\(.*\))""".toRegex()
-fun prepare(e: String): String {
-    print("Preparing: $e -> ")
-    var res = addGroupRegex.replace(e) { m -> "(${m.value})"}
-//    var res = e
-//    val matches = addGroupRegex.find(e)
-//    if (matches != null) {
-//        var m = matches.next()
-//        while (m != null) {
-//
-//            m = matches.next()
-//        }
-//    }
-    res = res.replace(")()", "))")
-    println(res)
-    return res
-}
-
 fun main() {
 //    val data = testData.map { parser(it) }
     val data = readFile({ parser(it) })
@@ -128,12 +110,6 @@ fun main() {
     println()
     println("Part 1: ${data.map { eval(it) }.sum()}")
     println()
-
-//    val data2 = testData.map { parser(prepare(it)) }
-//    val data2 = readFile({ parser(prepare(it)) })
-//    data2.forEach { println("$it: ${eval(it)}") }
-//    println()
-//    println("Part 2: ${data2.map { eval(it) }.sum()}")
 
 //    println("Part 2: ${testData.map { testIdea(it) }.sum()}")
     println("Part 2: ${readFile({ solvePart2(it) }).sum()}")
