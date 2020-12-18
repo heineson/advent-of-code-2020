@@ -1,6 +1,7 @@
 package se.heinszn.aoc2020.day18
 
 import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 enum class Op { PLUS, TIMES }
 data class Expr(val l: Expr? = null, val r: Expr? = null, val op: Op? = null, val k: Long? = null) {
@@ -21,8 +22,6 @@ data class Expr(val l: Expr? = null, val r: Expr? = null, val op: Op? = null, va
 
 fun parser(e: String): Expr {
     val tokens = e.split(" ")
-    val right = tokens.last()
-
     return parseTokens(tokens, null)
 }
 
@@ -45,14 +44,35 @@ fun parseTokens(ts: List<String>, right: Expr?): Expr {
         return parseTokens(rest, Expr(k = elem.toLong()))
     }
     return when (elem) {
-        "+" -> Expr(parseTokens(rest, right), right, Op.PLUS, null)
-        "*" -> Expr(parseTokens(rest, right), right, Op.TIMES, null)
+        "+" -> Expr(parseTokens(rest, right), right, Op.PLUS)
+        "*" -> Expr(parseTokens(rest, right), right, Op.TIMES)
         else -> {
             if (elem.endsWith(")")) {
-                val itemCount = rest.takeLastWhile { !it.startsWith("(") }.count() + 1
-                val items = (rest.takeLast(itemCount) + elem).map { it.removePrefix("(").removeSuffix(")") }
-                println("Expr(parseTokens(${rest.dropLast(itemCount + 1)}, right), parseTokens(${items}, right)), ${rest.dropLast(itemCount).last()}")
-                return Expr(parseTokens(rest.dropLast(itemCount + 1), right), parseTokens(items, right), parseOp(rest.dropLast(itemCount).last()))
+                val el = elem.removeSuffix(")")
+                var pCount = elem.takeLastWhile { it == ')' }.count()
+
+                var itemCount = 0
+                while (pCount > 0) {
+                    itemCount++
+                    val item = rest.takeLast(itemCount).first()
+                    if (item.startsWith("(")) {
+                        pCount -= item.takeWhile { it == '(' }.count()
+                    }
+                    if (item.endsWith(")")) {
+                        pCount += item.takeLastWhile { it == ')' }.count()
+                    }
+                }
+
+                //val itemCount = rest.takeLastWhile { !it.startsWith("(") }.count() + 1
+                val its = rest.takeLast(itemCount)
+                println("Test: $itemCount $its")
+                val items = listOf(its.first().removePrefix("(")) + its.drop(1) + el
+
+
+                val l = rest.dropLast(itemCount + 1)
+                val op = rest.dropLast(itemCount).lastOrNull()
+                println("Expr(parseTokens($l), parseTokens(${items})), $op")
+                return Expr(parseTokens(l, right), parseTokens(items, right), if (op == null) null else parseOp(op) )
             }
             throw IllegalArgumentException("Should not get here, value: $elem")
         }
@@ -75,12 +95,11 @@ fun eval(e: Expr): Long {
             }
         }
     }
-    return -1
-
+    throw IllegalStateException("No op and no number: ${e.l}, ${e.r}")
 }
 
 fun main() {
-    val data = testData.take(2).map { parser(it) }
+    val data = testData.map { parser(it) }
     data.forEach { println(it) }
     println()
     data.forEach { println(eval(it)) }
@@ -91,5 +110,7 @@ fun main() {
 val testData = """
     1 + 2 * 3 + 4 * 5 + 6
     2 * 3 + (4 * 5)
+    5 + (8 * 3 + 9 + 3 * 4 * 3)
+    5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))
     ((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
 """.trimIndent().split("\n")
