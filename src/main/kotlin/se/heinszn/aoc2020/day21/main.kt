@@ -11,23 +11,15 @@ fun parseLine(line: String): Item {
 fun allAllergens(items: List<Item>): List<String> = items.flatMap { it.allergens }.distinct()
 fun allIngredients(items: List<Item>): List<String> = items.flatMap { it.ingredients }.distinct()
 
-fun groupAllergens(items: List<Item>): List<Pair<String, Map<String, Int>>> {
-    val allergensEnglish = allAllergens(items)
-    val result = mutableListOf<Pair<String, Map<String, Int>>>()
-    allergensEnglish.forEach { ae ->
+fun findAllergens(items: List<Item>): List<Pair<String, String>> {
+    val grouped = allAllergens(items).map { ae ->
         val itemsWithAllergen = items.filter { it.allergens.contains(ae) }
         val occurrences = itemsWithAllergen.flatMap { it.ingredients }.groupingBy { it }.eachCount()
-        println("Allergen $ae: $occurrences")
-        result.add(Pair(ae, occurrences))
+        Pair(ae, occurrences)
     }
-    return result
-}
-
-fun findAllergens(grouped: List<Pair<String, Map<String, Int>>>): List<Pair<String, String>> {
     val result = mutableListOf<Pair<String, String>>()
     while (result.size < grouped.size) {
         val remaining = grouped.filter { it.first !in result.map { r -> r.first } }
-        val pre = result.size
         remaining.forEach { g ->
             val max = g.second.values.maxOrNull() ?: error("No max")
             val occursMost = g.second
@@ -38,14 +30,13 @@ fun findAllergens(grouped: List<Pair<String, Map<String, Int>>>): List<Pair<Stri
                 result.add(Pair(g.first, occursMost[0]))
             }
         }
-        if (pre == result.size) break
     }
     println("Found allergens: $result")
     return result
 }
 
 fun findNonAllergenOccurrences(items: List<Item>): Map<String, Int> {
-    val allergensForeign = findAllergens(groupAllergens(items)).map { it.second }
+    val allergensForeign = findAllergens(items).map { it.second }
     val nonAllergens = allIngredients(items).filter { it !in allergensForeign }
     val result = mutableMapOf<String, Int>()
     items.forEach { item ->
@@ -66,7 +57,7 @@ fun main() {
     println(nonAllergens)
     println("Part1: ${nonAllergens.map { it.value }.sum()}")
 
-    val allergens = findAllergens(groupAllergens(items))
+    val allergens = findAllergens(items)
     println("Part2: ${allergens.sortedBy { it.first }.joinToString(",") { it.second }}")
 }
 
