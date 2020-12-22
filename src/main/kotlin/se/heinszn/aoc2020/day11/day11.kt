@@ -1,13 +1,25 @@
 package se.heinszn.aoc2020.day11
 
 import se.heinszn.aoc2020.Coord
+import se.heinszn.aoc2020.Grid2d
 import se.heinszn.aoc2020.Vect
 import se.heinszn.aoc2020.readFile
 
 enum class SeatState { FLOOR, EMPTY, OCCUPIED }
 data class Seat(val coord: Coord, var state: SeatState)
 
+class Grid : Grid2d<SeatState>() {
+    override fun printElement(e: SeatState): Char {
+        return when (e) {
+            SeatState.FLOOR -> '.'
+            SeatState.OCCUPIED -> '#'
+            SeatState.EMPTY -> 'L'
+        }
+    }
+}
+
 var lineCounter = 0
+
 fun lineParser(line: String): List<Seat> {
     val seats = line.toList().mapIndexed { index, c ->
         when(c) {
@@ -21,12 +33,14 @@ fun lineParser(line: String): List<Seat> {
     return seats
 }
 
-fun findStableState(seats: List<Seat>): List<Seat> {
-    val nextState = seats.map { mapper2(it, seats) }
-    if (nextState.containsAll(seats)) {
+fun findStableState(seats: Grid): Grid {
+    val nextState = seats.getEntries().map { mapper2(Seat(it.key, it.value), seats) }
+    val nextGrid = Grid()
+    nextState.forEach { seat -> nextGrid[seat.coord] = seat.state }
+    if (nextGrid == seats) {
         return seats
     }
-    return findStableState(nextState)
+    return findStableState(nextGrid)
 }
 
 fun mapper(s: Seat, data: List<Seat>): Seat {
@@ -46,16 +60,15 @@ fun mapper(s: Seat, data: List<Seat>): Seat {
     return s
 }
 
-fun mapper2(s: Seat, data: List<Seat>): Seat {
+fun mapper2(s: Seat, grid: Grid): Seat {
     if (s.state == SeatState.EMPTY) {
-        val ns = getVisible(s, data)
-        //println("$s, surrounding: $ns")
+        val ns = getVisibleFrom(s.coord, grid)
         if(ns.count { it.state == SeatState.OCCUPIED } == 0) {
             return s.copy(state = SeatState.OCCUPIED)
         }
     }
     if (s.state == SeatState.OCCUPIED) {
-        val ns = getVisible(s, data)
+        val ns = getVisibleFrom(s.coord, grid)
         if(ns.count { it.state == SeatState.OCCUPIED } >= 5) {
             return s.copy(state = SeatState.EMPTY)
         }
@@ -63,33 +76,34 @@ fun mapper2(s: Seat, data: List<Seat>): Seat {
     return s
 }
 
-fun getVisible(s: Seat, data: List<Seat>): List<Seat> {
-    val ns = s.coord.surroundingNeighbors().mapNotNull { n -> data.find { d -> d.coord == n } }
-    val result = mutableListOf<Seat>()
+fun getVisibleFrom(coord: Coord, grid: Grid): Set<Seat> {
+    val ns = coord.surroundingNeighbors().filter { grid[it] != null }.map { n -> Seat(n, grid.getValue(n)) }
+    val result = mutableSetOf<Seat>()
     result.addAll(ns.filter { it.state != SeatState.FLOOR })
 
-    val floors = ns.filter { it.state == SeatState.FLOOR }
-    floors.forEach { f -> run {
-        val d = Vect(f.coord.x - s.coord.x, f.coord.y - s.coord.y)
+    val floors = ns.filter { it.state == SeatState.FLOOR }.map { it.coord }
+    floors.forEach { f ->
+        val d = Vect(f.x - coord.x, f.y - coord.y)
         val whileCondition = fun(c: Coord): Boolean {
-            val v = data.find { it.coord == c }
-            return v != null && v.state == SeatState.FLOOR
+            val seatState = grid[c]
+            return seatState != null && seatState == SeatState.FLOOR
         }
-        //println(f.coord.inDirectionWhile(d) { whileCondition(it) } + d)
-        val res = data.find { seat -> ((f.coord.inDirectionWhile(d) { whileCondition(it) }).lastOrNull() ?: f.coord) + d == seat.coord }
-        if (res != null) result.add(res)
-    } }
+        val target = ((f.inDirectionWhile(d) { whileCondition(it) }).lastOrNull() ?: f) + d
+        grid[target]?.let { result.add(Seat(target, it)) }
+    }
 
     return result
 }
 
 fun main() {
     lineCounter = 0
+    val grid = Grid()
 //    val data = testData.flatMap { lineParser(it) }
      val data = readFile({ lineParser(it) }).flatten()
-    //println(data)
+     data.forEach { grid[it.coord] = it.state }
+    println(grid)
 
-    println("Occupied: ${findStableState(data).count { it.state == SeatState.OCCUPIED }}")
+    println("Occupied: ${findStableState(grid).getEntries().count { it.value == SeatState.OCCUPIED }}")
 }
 
 val testData = """

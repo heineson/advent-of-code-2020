@@ -66,7 +66,7 @@ data class Vect(val dx: Int, val dy: Int) {
     }
 }
 
-class Grid2d<T> {
+open class Grid2d<T> {
     private val data = mutableMapOf<Coord, T>()
 
     operator fun set(c: Coord, d: T) {
@@ -77,6 +77,11 @@ class Grid2d<T> {
         return data[c]
     }
 
+    fun getValue(c: Coord): T = data.getValue(c)
+    fun getCoords() = data.keys
+    fun getValues() = data.values
+    fun getEntries() = data.entries
+
     fun getDimensionRanges(): Pair<IntRange, IntRange> {
         val xr: IntRange = (data.keys.minOfOrNull { it.x } ?: 0)..(data.keys.maxOfOrNull { it.x } ?: 0)
         val yr: IntRange = (data.keys.minOfOrNull { it.y } ?: 0)..(data.keys.maxOfOrNull { it.y } ?: 0)
@@ -85,20 +90,24 @@ class Grid2d<T> {
 
     fun getSides(): List<List<Pair<Coord, T>>> {
         val (xr, yr) = getDimensionRanges()
-        val top = data.entries.filter { it.key.y == yr.last }.map { Pair(it.key, it.value) }
-        val right = data.entries.filter { it.key.x == xr.last }.map { Pair(it.key, it.value) }
-        val down = data.entries.filter { it.key.y == yr.first }.map { Pair(it.key, it.value) }
-        val left = data.entries.filter { it.key.x == xr.first }.map { Pair(it.key, it.value) }
-        return listOf(top, right, down, left)
+        return listOf(
+                data.entries.filter { it.key.y == yr.last }.map { Pair(it.key, it.value) },
+                data.entries.filter { it.key.x == xr.last }.map { Pair(it.key, it.value) },
+                data.entries.filter { it.key.y == yr.first }.map { Pair(it.key, it.value) },
+                data.entries.filter { it.key.x == xr.first }.map { Pair(it.key, it.value) }
+        )
     }
 
-    fun printElement(e: T): Char {
-        if (e is Int || e is Long) {
-            return if (e != 0) '#' else '.'
+    open fun printElement(e: T): Char {
+        return if (e is Int || e is Long) {
+            if (e != 0) '#' else '.'
         } else if (e is Boolean) {
-            return if (e) '#' else '.'
+            if (e) '#' else '.'
+        } else if (e is Char) {
+            e
+        } else {
+            '.'
         }
-        return '.'
     }
 
     override fun toString(): String {
@@ -111,6 +120,19 @@ class Grid2d<T> {
             r += "\n"
         }
         return r
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Grid2d<*>) return false
+
+        if (data != other.data) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return data.hashCode()
     }
 }
 
