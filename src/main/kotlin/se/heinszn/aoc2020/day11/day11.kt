@@ -71,11 +71,12 @@ fun getVisible(s: Seat, data: List<Seat>): List<Seat> {
     val floors = ns.filter { it.state == SeatState.FLOOR }
     floors.forEach { f -> run {
         val d = Vect(f.coord.x - s.coord.x, f.coord.y - s.coord.y)
-        val stopCondition = fun(c: Coord): Boolean {
+        val whileCondition = fun(c: Coord): Boolean {
             val v = data.find { it.coord == c }
-            return v == null || v.state != SeatState.FLOOR
+            return v != null && v.state == SeatState.FLOOR
         }
-        val res = data.find { seat -> f.coord.inDirectionUntil(d) { stopCondition(it) }.last() == seat.coord }
+        //println(f.coord.inDirectionWhile(d) { whileCondition(it) } + d)
+        val res = data.find { seat -> ((f.coord.inDirectionWhile(d) { whileCondition(it) }).lastOrNull() ?: f.coord) + d == seat.coord }
         if (res != null) result.add(res)
     } }
 
