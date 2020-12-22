@@ -2,7 +2,6 @@ package se.heinszn.aoc2020.day20
 
 import se.heinszn.aoc2020.Coord
 import se.heinszn.aoc2020.Grid2d
-import se.heinszn.aoc2020.readFileIntoTokens
 import se.heinszn.aoc2020.readLinesIntoTokens
 import kotlin.math.sqrt
 
@@ -41,15 +40,16 @@ fun findCornerTileIds(sides: List<Pair<Int, List<List<Int>>>>): List<Int> {
 }
 
 fun main() {
-    // val tiles = readLinesIntoTokens(testData).map { parseTile(it) }
-    val tiles = readFileIntoTokens().map { parseTile(it) }
+     val tiles = readLinesIntoTokens(testData).map { parseTile(it) }
+//    val tiles = readFileIntoTokens().map { parseTile(it) }
     val gridSize = sqrt(tiles.size.toDouble()).toInt()
 
     println(tiles)
     println(gridSize)
-    val v = tiles.map { Pair(it.id, findMatchingTileIds(it, tiles)) }
-    val corners = findCornerTileIds(v)
-    println("Part1 : ${corners.fold(1L) { acc, i -> acc * i } }")
+    val v = tiles.map { println(Pair(it.id, findMatchingTileIds(it, tiles))); Pair(it.id, findMatchingTileIds(it, tiles)) }
+    println("Part1 : ${findCornerTileIds(v).fold(1L) { acc, i -> acc * i } }")
+
+
 }
 
 val testData = """
