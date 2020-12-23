@@ -48,8 +48,7 @@ fun <E> List<E>.circularGet(index: Int) = this[this.getCircularIndex(index)]
 
 fun <E> List<E>.circularSubList(fromIndex: Int, toIndex: Int): List<E> {
     val realFrom = this.getCircularIndex(fromIndex)
-    val realTo = this.getCircularIndex(toIndex)
-    return if (realTo < realFrom) {
-        this.subList(realFrom, this.size) + this.subList(0, realTo)
-    } else this.subList(realFrom, realTo)
+    val realTo = this.getCircularIndex(toIndex - 1) + 1
+    return if (realTo < realFrom) this.subList(realFrom, this.size) + this.subList(0, realTo)
+    else this.subList(realFrom, realTo)
 }

@@ -37,6 +37,8 @@ internal class UtilsKtTest {
 
         assertThat(list.circularSubList(0, 9)).isEqualTo(list)
         assertThat(list.circularSubList(-2, 9)).isEqualTo(listOf(8, 9))
+        assertThat(list.circularSubList(5, 12)).isEqualTo(listOf(6, 7, 8, 9, 1, 2, 3))
+        assertThat(list.circularSubList(7, 2)).isEqualTo(listOf(8, 9, 1, 2))
     }
 
     private val lines1 = """
