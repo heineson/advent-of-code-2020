@@ -1,9 +1,6 @@
 package se.heinszn.aoc2020
 
 import java.io.File
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.sqrt
 
 /****** Input data utils *******/
 
@@ -44,3 +41,15 @@ fun readFileIntoTokens(groupSeparatorLinePattern: String = "", tokenSeparator: S
 /****** extensions *******/
 
 fun <E> Iterable<E>.updateElement(index: Int, newElem: E) = mapIndexed { i, existing ->  if (i == index) newElem else existing }
+
+fun <E> List<E>.getCircularIndex(index: Int) = if (index < 0) this.size - (-index % this.size) else index % this.size
+
+fun <E> List<E>.circularGet(index: Int) = this[this.getCircularIndex(index)]
+
+fun <E> List<E>.circularSubList(fromIndex: Int, toIndex: Int): List<E> {
+    val realFrom = this.getCircularIndex(fromIndex)
+    val realTo = this.getCircularIndex(toIndex)
+    return if (realTo < realFrom) {
+        this.subList(realFrom, this.size) + this.subList(0, realTo)
+    } else this.subList(realFrom, realTo)
+}
