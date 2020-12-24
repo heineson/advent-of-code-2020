@@ -173,3 +173,17 @@ data class Coord4(val x: Int, val y: Int, val z: Int, val w: Int) {
         return coords
     }
 }
+
+/****** Hexagonal grid utils ********/
+
+// Since they do not align in a traditional 2d grid, the step number is 2 between orthogonal tiles
+data class HexCoord(val x: Int, val y: Int) {
+    fun e() = HexCoord(x + 2, y)
+    fun se() = HexCoord(x + 1, y - 1)
+    fun sw() = HexCoord(x - 1, y - 1)
+    fun w() = HexCoord(x - 2, y)
+    fun nw() = HexCoord(x - 1, y + 1)
+    fun ne() = HexCoord(x + 1, y + 1)
+
+    fun surroundingNeighbors() = listOf(e(), se(), sw(), w(), nw(), ne())
+}
