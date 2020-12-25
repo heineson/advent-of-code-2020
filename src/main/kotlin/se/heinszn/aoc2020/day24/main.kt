@@ -27,13 +27,15 @@ fun getTarget(start: HexCoord, path: List<String>): HexCoord {
 fun isBlack(value: Int?) = (value ?: 0) % 2 == 1
 
 fun part1(data: List<List<String>>): MutableMap<HexCoord, Int> {
+    val timestamp = System.currentTimeMillis()
     val flipped = mutableMapOf<HexCoord, Int>()
     data.forEach {
         val t = getTarget(HexCoord(0, 0), it)
         flipped[t] = flipped.getOrDefault(t, 0) + 1
     }
     val black = flipped.values.filter { isBlack(it) }.count()
-    println("Part1: $black\n")
+    println("Part1: $black")
+    println("Part1 time: ${System.currentTimeMillis() - timestamp}ms\n")
     return flipped
 }
 
@@ -58,11 +60,14 @@ fun turn(flipped: Map<HexCoord, Int>): Map<HexCoord, Int> {
 }
 
 fun part2(flipped: Map<HexCoord, Int>) {
+    val timestamp = System.currentTimeMillis()
     var current = flipped
     for (i in 1..100) {
         current = turn(current)
-        println("Day $i: ${current.values.filter { isBlack(it) }.count()}")
+        //println("Day $i: ${current.values.filter { isBlack(it) }.count()}")
     }
+    println("Part2: ${current.values.filter { isBlack(it) }.count()}")
+    println("Part2 time: ${System.currentTimeMillis() - timestamp}ms\n")
 }
 
 fun main() {
